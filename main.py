@@ -4,6 +4,7 @@ import pytesseract
 import fitz  # PyMuPDF
 import os
 import uuid
+import base64
 
 # Page configuration
 st.set_page_config(page_title="🏥 Hospital Report Analyzer", layout="wide")
@@ -30,6 +31,12 @@ def extract_text_from_pdf(uploaded_pdf):
     for page in doc:
         text += page.get_text()
     return text
+
+# Download link function
+def get_download_link(text, filename):
+    b64 = base64.b64encode(text.encode()).decode()
+    href = f'<a href="data:file/txt;base64,{b64}" download="{filename}">📥 Download This Report</a>'
+    return href
 
 # Main Upload Area
 if patient_name:
@@ -60,6 +67,9 @@ if patient_name:
                 f.write(extracted_text)
 
             st.success(f"✅ Report saved successfully under: `{file_path}`")
+
+            # Download link
+            st.markdown(get_download_link(extracted_text, f"{patient_name}_report.txt"), unsafe_allow_html=True)
 
             # Display Previous Reports
             st.subheader("📚 Previous Reports for Comparison")
